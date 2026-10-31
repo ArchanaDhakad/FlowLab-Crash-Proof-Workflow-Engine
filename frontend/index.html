@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Page metadata and the stylesheet served by FastAPI. -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1321">
+    <title>Crash-Proof Workflow Engine — FlowLab</title>
+    <link rel="shortcut icon" href="/assets/favicon.ico" >
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <section id="login-screen" class="login-screen" hidden aria-labelledby="login-title">
+      <form id="login-form" class="login-card">
+        <div class="login-brand" aria-hidden="true">◇</div>
+        <p class="login-kicker">PRIVATE WORKSPACE</p>
+        <h1 id="login-title">Welcome to FlowLab</h1>
+        <p id="login-copy" class="login-copy">Create the owner account for this FlowLab workspace.</p>
+        <label for="login-email">Email address</label>
+        <input id="login-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+        <label for="login-password">Password</label>
+        <div class="password-input-wrap">
+          <input id="login-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required>
+          <button class="password-visibility" type="button" data-password-target="login-password" aria-label="Show password" aria-pressed="false">Show</button>
+        </div>
+        <ul id="password-requirements" class="password-requirements">
+          <li>At least 12 characters</li>
+          <li>At least 1 lowercase letter (a-z)</li>
+          <li>At least 1 uppercase letter (A-Z)</li>
+          <li>At least 1 number (0-9)</li>
+          <li>At least 1 special character, e.g. ! @ # $</li>
+        </ul>
+        <div id="confirm-password-field">
+          <label for="confirm-password">Confirm password</label>
+          <div class="password-input-wrap">
+            <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" minlength="12" maxlength="1024" required>
+            <button class="password-visibility" type="button" data-password-target="confirm-password" aria-label="Show confirm password" aria-pressed="false">Show</button>
+          </div>
+        </div>
+        <p id="login-error" class="login-error" role="alert" hidden></p>
+        <button id="login-submit" class="button button-primary" type="submit">Create account</button>
+        <p id="auth-toggle-copy" class="login-help">Already created your account?</p>
+        <button id="auth-toggle" class="auth-toggle" type="button">Sign in instead</button>
+        <p class="login-help">FlowLab stores one owner account on this computer. Use your email and password to sign in next time.</p>
+      </form>
+    </section>
+    <main class="landing">
+      <header class="intro">
+        <p class="intro-kicker">FLOWLAB · WORKFLOW STUDIO</p>
+        <h1>Crash-Proof<br><span>Workflow Engine</span></h1>
+        <p class="intro-copy">
+          Design and run workflows one step at a time. Save your automations,
+          see each result, and keep a local history of recent runs.
+        </p>
+      </header>
+
+      <section class="app-window" aria-label="FlowLab workflow dashboard">
+        <header class="window-bar" aria-label="Application window">
+          <span class="window-dot window-dot-red"></span>
+          <span class="window-dot window-dot-yellow"></span>
+          <span class="window-dot window-dot-green"></span>
+          <span class="window-title">FlowLab — Workflow Studio</span>
+          <span class="connection-state" id="api-status" role="status" aria-live="polite">
+            <span class="connection-dot"></span>
+            <span id="api-status-text">Connecting…</span>
+          </span>
+          <button id="logout-button" class="logout-button" type="button" title="Sign out" aria-label="Sign out">↪ <span>Sign out</span></button>
+        </header>
+
+        <div class="app-layout">
+          <aside class="sidebar">
+            <a class="brand" href="/" aria-label="FlowLab home">
+              <span class="brand-icon" aria-hidden="true">◇</span>
+              <span>FlowLab</span>
+            </a>
+
+            <p class="nav-label">WORKSPACE</p>
+            <nav class="navigation" aria-label="Workflow navigation">
+              <a class="nav-link active" href="#workflow-view" aria-current="page">
+                <span class="nav-icon" aria-hidden="true">♧</span>
+                <span>Workflows</span>
+                <span class="nav-count" id="workflow-count">0</span>
+              </a>
+              <a class="nav-link" href="#execution-history">
+                <span class="nav-icon" aria-hidden="true">☷</span>
+                <span>Tasks &amp; Runs</span>
+                <span class="nav-count" id="execution-count">0</span>
+              </a>
+              <a class="nav-link" href="#schedules">
+                <span class="nav-icon" aria-hidden="true">▦</span><span>Schedules</span>
+                <span class="nav-count" id="schedule-count">0</span>
+              </a>
+            </nav>
+
+            <div class="sidebar-spacer"></div>
+            <div class="sidebar-note">
+              <span class="note-symbol" aria-hidden="true">i</span>
+              <p>Runs, retries, resumable tasks and schedules are saved in the local SQLite database.</p>
+            </div>
+            <div class="workspace-user">
+              <span class="user-avatar">FL</span>
+              <span><strong>Local workspace</strong><small>On this computer</small></span>
+            </div>
+          </aside>
+
+          <div class="main-panel">
+            <div class="breadcrumbs">
+              <span>Workflows</span><span class="crumb-divider">›</span>
+              <strong id="breadcrumb-workflow">Select a workflow</strong>
+            </div>
+
+            <section id="workflow-view" class="workflow-view">
+              <div class="workflow-heading">
+                <div class="workflow-title-area">
+                  <div class="title-line">
+                    <h2 id="workflow-title">Your workflows</h2>
+                    <span id="workflow-status" class="status-badge status-idle">Ready</span>
+                  </div>
+                  <p id="workflow-description">Select a saved workflow or create a new one to get started.</p>
+                </div>
+                <div class="heading-actions">
+                  <button class="button button-secondary" id="new-workflow" type="button">＋ New workflow</button>
+                  <button class="button button-secondary" id="edit-workflow" type="button" disabled>Edit</button>
+                  <button class="button button-primary" id="run-workflow" type="button" disabled>
+                    <span aria-hidden="true">▶</span> Start Workflow
+                  </button>
+                </div>
+              </div>
+
+              <div class="workflow-picker">
+                <label for="workflow-select">Active workflow</label>
+                <select id="workflow-select" aria-label="Select workflow">
+                  <option value="">No saved workflows</option>
+                </select>
+                <button class="icon-button" id="refresh-workflows" type="button" title="Refresh workflows" aria-label="Refresh workflows">↻</button>
+                <button class="icon-button icon-button-danger" id="delete-workflow" type="button" title="Delete selected workflow" aria-label="Delete selected workflow" disabled>×</button>
+              </div>
+
+              <div class="flow-section">
+                <div class="section-title">
+                  <div><span class="section-mark" aria-hidden="true">↳</span><h3>Workflow steps</h3></div>
+                  <span id="step-summary">0 steps</span>
+                </div>
+                <div class="flow-track-wrap">
+                  <div id="step-flow" class="step-flow">
+                    <div class="empty-state">Create a workflow to see its steps here.</div>
+                  </div>
+                </div>
+              </div>
+
+              <section class="history-section" id="execution-history">
+                <div class="section-title history-title">
+                  <div><span class="section-mark" aria-hidden="true">◷</span><h3>Tasks &amp; Execution History</h3></div>
+                  <div class="history-actions">
+                    <span class="history-local">SQLite · persistent</span>
+                    <button class="text-button" id="clear-history" type="button">Clear history</button>
+                  </div>
+                </div>
+                <div class="history-table-wrap">
+                  <table class="history-table">
+                    <thead>
+                      <tr><th>Workflow / Step</th><th>Status</th><th>Started At</th><th>Duration</th><th>Result / Action</th></tr>
+                    </thead>
+                    <tbody id="history-body">
+                      <tr><td class="table-empty" colspan="5">No workflow runs yet. Start a workflow to see its execution log.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section class="saved-section" aria-labelledby="saved-title">
+                <div class="section-title">
+                  <div><span class="section-mark" aria-hidden="true">☰</span><h3 id="saved-title">Saved workflows</h3></div>
+                  <span id="saved-summary">0 workflows</span>
+                </div>
+                <div id="workflow-list" class="workflow-list">
+                  <div class="empty-state">Loading workflows…</div>
+                </div>
+              </section>
+
+              <section class="saved-section schedule-section" id="schedules" aria-labelledby="schedule-title">
+                <div class="section-title">
+                  <div><span class="section-mark" aria-hidden="true">▦</span><h3 id="schedule-title">Workflow schedules</h3></div>
+                  <span id="schedule-summary">Server-local time</span>
+                </div>
+                <form id="schedule-form" class="schedule-form">
+                  <label for="schedule-type">Repeat</label>
+                  <select id="schedule-type" name="schedule_type">
+                    <option value="interval">Every N minutes</option>
+                    <option value="daily">Every day at a time</option>
+                  </select>
+                  <label id="interval-label" for="schedule-interval">Minutes</label>
+                  <input id="schedule-interval" name="interval_minutes" type="number" min="1" max="10080" value="15">
+                  <label id="time-label" for="schedule-time" hidden>Daily time</label>
+                  <input id="schedule-time" name="run_at" type="time" value="09:00" hidden>
+                  <button class="button button-primary" type="submit">＋ Add schedule</button>
+                </form>
+                <div id="schedule-list" class="workflow-list">
+                  <div class="empty-state">Loading schedules…</div>
+                </div>
+              </section>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <footer class="landing-footer">
+        <span>FlowLab <span aria-hidden="true">·</span> Local workflow playground</span>
+        <a href="/docs" target="_blank" rel="noreferrer">API documentation <span aria-hidden="true">↗</span></a>
+      </footer>
+    </main>
+
+    <dialog id="workflow-dialog" class="workflow-dialog">
+      <form id="workflow-form" method="dialog" novalidate>
+        <div class="dialog-heading">
+          <div><span class="dialog-kicker">WORKFLOW EDITOR</span><h2>Create a workflow</h2></div>
+          <button class="icon-button" id="close-dialog" type="button" aria-label="Close dialog">×</button>
+        </div>
+        <label for="workflow-name">Workflow name</label>
+        <input id="workflow-name" name="name" maxlength="120" required placeholder="e.g. Prepare a welcome message">
+        <div class="label-row">
+          <label>Workflow steps</label>
+          <button id="load-example" class="text-button" type="button">Load example</button>
+        </div>
+        <div id="step-draft-list" class="step-draft-list" aria-live="polite"></div>
+        <section class="step-composer" aria-labelledby="step-composer-title">
+          <div class="composer-heading">
+            <strong id="step-composer-title">Add a step</strong>
+            <span>STEP CONFIGURATION</span>
+          </div>
+          <label for="step-type">Step type</label>
+          <select id="step-type" name="step_type">
+            <option value="set">Set value</option>
+            <option value="add">Add number</option>
+            <option value="multiply">Multiply number</option>
+            <option value="uppercase">Uppercase text</option>
+            <option value="append">Append text</option>
+            <option value="email">Send email</option>
+            <option value="http">HTTP request</option>
+            <option value="file">File action</option>
+          </select>
+          <div id="step-fields" class="step-fields"></div>
+          <p id="step-hint" class="field-help">Use {{key}} to insert workflow data.</p>
+          <p id="step-error" class="step-error" role="alert" hidden></p>
+          <div class="step-composer-actions">
+            <button id="add-step" class="button button-secondary" type="button">＋ Add step</button>
+          </div>
+        </section>
+        <p id="steps-help" class="field-help">Use the step editor to configure and validate each workflow action.</p>
+        <div class="dialog-actions">
+          <span id="form-message" class="form-message" role="status" aria-live="polite"></span>
+          <button class="button button-secondary" id="cancel-dialog" type="button">Cancel</button>
+          <button class="button button-primary" type="submit">Save workflow</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/static/script.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,205 @@
+/* Load display and code fonts; fallback fonts work if the remote font is unavailable. */
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap");
+
+/* App-wide colors, fonts, and reusable theme values. */
+:root {
+  color-scheme: dark;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
+  background: #101522;
+  color: #e8ebf3;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --muted: #8d96aa;
+  --border: #282f40;
+  --panel: #171d2b;
+  --accent: #9c8cff;
+}
+
+* { box-sizing: border-box; }
+
+/* Base page and form control defaults. */
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+
+/* Main two-column app shell and navigation sidebar. */
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 238px;
+  flex: 0 0 238px;
+  padding: 27px 18px 20px;
+  background: #131927;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #f2f1ff;
+  text-decoration: none;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+}
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: #17132d;
+  background: linear-gradient(140deg, #c2b9ff, #8874ff);
+}
+.brand-light { color: #aaa1d8; font-weight: 500; }
+.sidebar-label {
+  margin: 48px 10px 12px;
+  color: #737d92;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.15px;
+}
+.nav-item {
+  border: 0;
+  text-align: left;
+  color: #c9cce0;
+  background: #25243b;
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-weight: 600;
+}
+.nav-icon { color: #b2a7ff; margin-right: 9px; }
+.sidebar-footer {
+  margin-top: auto;
+  padding: 13px 10px 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #58d4a0;
+  box-shadow: 0 0 10px #58d48055;
+}
+
+/* Main content header, page title, and responsive two-panel workspace. */
+.main-content { width: min(100%, 1500px); margin: 0 auto; padding: 0 42px; }
+.topbar {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+}
+.breadcrumbs span { margin: 0 10px; color: #545d70; }
+.api-status { display: flex; align-items: center; gap: 8px; color: #afb7c7; }
+.page-heading { padding: 38px 0 26px; }
+.eyebrow { margin: 0 0 9px; color: #a99cff; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; }
+h1 { margin: 0; font-size: clamp(26px, 3vw, 34px); letter-spacing: -1px; }
+.subtitle, .panel-heading p { color: var(--muted); font-size: 13px; }
+.subtitle { margin: 8px 0 0; }
+.workspace-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr); gap: 20px; align-items: start; }
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
+.editor-panel, .saved-panel { padding: 22px; }
+.panel-heading { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; margin-bottom: 22px; }
+.panel-heading h2 { font-size: 15px; margin: 0; }
+.panel-heading p { font-size: 12px; margin: 6px 0 0; line-height: 1.5; }
+.step-badge { border: 1px solid #39334f; border-radius: 5px; color: #b8aaff; padding: 4px 7px; font: 10px "DM Mono", monospace; }
+
+/* Workflow name and JSON editor form controls, including focus and helper styles. */
+label { display: block; color: #d7dbea; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+input, textarea {
+  width: 100%;
+  border: 1px solid #343b4d;
+  border-radius: 7px;
+  outline: none;
+  background: #111724;
+  color: #e8ebf3;
+}
+input { height: 40px; padding: 0 11px; font-size: 13px; }
+input:focus, textarea:focus { border-color: #8877ed; box-shadow: 0 0 0 3px #8877ed20; }
+input::placeholder { color: #697286; }
+.label-row { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
+.label-row label { margin-bottom: 8px; }
+textarea {
+  display: block;
+  min-height: 210px;
+  resize: vertical;
+  padding: 13px;
+  font: 12px/1.7 "DM Mono", Consolas, monospace;
+  tab-size: 2;
+}
+.field-help { margin: 9px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+code { color: #c0b5ff; font-family: "DM Mono", Consolas, monospace; }
+.form-actions { display: flex; align-items: center; gap: 12px; margin-top: 17px; }
+.button { border: 0; border-radius: 7px; padding: 10px 14px; font-size: 12px; font-weight: 700; }
+.button-primary { background: #a497ff; color: #17132d; }
+.button-primary:hover { background: #b5aaff; }
+.button:disabled { opacity: .55; cursor: wait; }
+.form-message { font-size: 11px; color: var(--muted); }
+.form-message.error { color: #ff9a9a; }
+.form-message.success { color: #72dfb0; }
+.text-button { padding: 4px 0; color: #b4a9ff; background: none; border: 0; font-size: 11px; }
+.text-button:hover { color: #d2cbff; }
+.reference { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.reference h3, .output-heading h3 { margin: 0; font-size: 11px; color: #aab2c3; }
+.reference pre, .run-output pre {
+  overflow: auto;
+  padding: 12px;
+  margin: 10px 0 0;
+  border: 1px solid #272e3d;
+  border-radius: 7px;
+  background: #111724;
+  font: 10px/1.75 "DM Mono", Consolas, monospace;
+}
+.reference pre code, .run-output pre code { color: #bdc5d6; }
+
+/* Saved-workflow list cards, action buttons, empty state, and execution output. */
+.icon-button { border: 1px solid var(--border); background: #202738; color: #c3bddf; border-radius: 6px; width: 30px; height: 30px; font-size: 17px; }
+.workflow-list { display: grid; gap: 10px; }
+.empty-state { padding: 24px 12px; text-align: center; color: var(--muted); font-size: 12px; border: 1px dashed #343b4d; border-radius: 8px; }
+.workflow-card { padding: 13px; border: 1px solid #2d3546; border-radius: 8px; background: #1a2130; }
+.workflow-card-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.workflow-card h3 { margin: 0; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.workflow-meta { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
+.workflow-actions { display: flex; gap: 7px; margin-top: 12px; }
+.run-button, .delete-button { border-radius: 5px; padding: 6px 9px; font-size: 10px; font-weight: 600; }
+.run-button { border: 1px solid #7669c9; color: #c4baff; background: #342d58; }
+.run-button:hover { background: #40376d; }
+.delete-button { border: 1px solid #49323c; color: #e69b9b; background: #30232d; }
+.delete-button:hover { background: #432b38; }
+.output-heading { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; }
+.run-output pre { max-height: 260px; }
+footer { padding: 28px 0 22px; text-align: center; color: #717a8d; font-size: 10px; }
+footer span { padding: 0 5px; color: #a99cff; }
+
+/* At tablet widths, stack the editor and saved-workflow panels. */
+@media (max-width: 900px) {
+  .sidebar { width: 190px; flex-basis: 190px; }
+  .main-content { padding: 0 24px; }
+  .workspace-grid { grid-template-columns: 1fr; }
+}
+
+/* On phones, shrink the sidebar and reduce main content spacing. */
+@media (max-width: 600px) {
+  .sidebar { width: 58px; flex-basis: 58px; padding: 20px 10px; align-items: center; }
+  .brand { font-size: 0; }
+  .brand-mark { font-size: 17px; }
+  .sidebar-label, .sidebar-footer { display: none; }
+  .nav-item { width: 38px; padding: 10px; overflow: hidden; white-space: nowrap; font-size: 0; }
+  .nav-icon { font-size: 16px; margin: 0; }
+  .main-content { padding: 0 14px; }
+  .topbar { height: 58px; font-size: 11px; }
+  .api-status { font-size: 0; }
+  .page-heading { padding: 28px 0 20px; }
+  .editor-panel, .saved-panel { padding: 16px; }
+}

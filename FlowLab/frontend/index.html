@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Browser encoding, responsive layout, tab color, title aur app stylesheet. -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101522">
+    <title>FlowLab — Workflow Studio</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <!-- Main app layout: navigation on the left, workflow tools on the right. -->
+    <div class="app-shell">
+      <aside class="sidebar">
+        <!-- Brand and the single workspace navigation item. -->
+        <a class="brand" href="/" aria-label="FlowLab home">
+          <span class="brand-mark">F</span>
+          <span>Flow<span class="brand-light">Lab</span></span>
+        </a>
+        <p class="sidebar-label">WORKSPACE</p>
+        <button class="nav-item active" type="button">
+          <span class="nav-icon">◈</span> Workflows
+        </button>
+        <div class="sidebar-footer">
+          <span class="status-dot"></span>
+          <span>Local workspace</span>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <!-- Top status bar and page heading introduce the workflow workspace. -->
+        <header class="topbar">
+          <div class="breadcrumbs">Workspace <span>/</span> Workflows</div>
+          <div class="api-status"><span class="status-dot"></span> API connected</div>
+        </header>
+
+        <section class="page-heading">
+          <div>
+            <p class="eyebrow">AUTOMATION STUDIO</p>
+            <h1>Build a workflow</h1>
+            <p class="subtitle">Create, save, and run simple data workflows.</p>
+          </div>
+        </section>
+
+        <!-- Left panel edits workflow JSON; right panel lists and runs saved workflows. -->
+        <div class="workspace-grid">
+          <section class="panel editor-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Workflow editor</h2>
+                <p>Define your workflow as a sequence of steps.</p>
+              </div>
+              <span class="step-badge">JSON</span>
+            </div>
+
+            <!-- JavaScript reads this form and sends its name and JSON steps to the API. -->
+            <form id="workflow-form">
+              <label for="workflow-name">Workflow name</label>
+              <input id="workflow-name" name="name" maxlength="120" required
+                     placeholder="e.g. Prepare a welcome message">
+
+              <div class="label-row">
+                <label for="workflow-steps">Steps</label>
+                <button id="load-example" class="text-button" type="button">Load example</button>
+              </div>
+              <textarea id="workflow-steps" name="steps" spellcheck="false"
+                        aria-describedby="steps-help" required></textarea>
+              <p id="steps-help" class="field-help">
+                Supported types: <code>set</code>, <code>add</code>,
+                <code>multiply</code>, <code>uppercase</code>, <code>append</code>.
+              </p>
+              <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                  <span>＋</span> Save workflow
+                </button>
+                <span id="form-message" class="form-message" role="status"></span>
+              </div>
+            </form>
+
+            <!-- Small examples show the JSON shape expected for individual steps. -->
+            <div class="reference">
+              <h3>Step examples</h3>
+              <pre><code>{"type":"set","key":"message","value":"hello"}
+{"type":"uppercase","key":"message"}
+{"type":"add","key":"total","value":5}</code></pre>
+            </div>
+          </section>
+
+          <!-- JavaScript fills this list from /api/workflows and displays run results here. -->
+          <section class="panel saved-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Saved workflows</h2>
+                <p>Run a workflow or remove one from your workspace.</p>
+              </div>
+              <button id="refresh-workflows" class="icon-button" type="button"
+                      aria-label="Refresh workflows" title="Refresh">↻</button>
+            </div>
+            <div id="workflow-list" class="workflow-list">
+              <div class="empty-state">Loading workflows…</div>
+            </div>
+            <div id="run-output" class="run-output" hidden>
+              <div class="output-heading">
+                <h3>Run result</h3>
+                <button id="clear-output" class="text-button" type="button">Clear</button>
+              </div>
+              <pre><code id="output-content"></code></pre>
+            </div>
+          </section>
+        </div>
+        <footer>FlowLab <span>·</span> A lightweight workflow playground</footer>
+      </main>
+    </div>
+    <!-- defer waits until HTML is parsed, then runs the browser-side app logic. -->
+    <script src="/static/script.js" defer></script>
+  </body>
+</html>

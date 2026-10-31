@@ -1,0 +1,6 @@
+# HTTP API aur request validation ke liye web framework.
+fastapi>=0.110,<1.0
+# FastAPI app ko local ASGI server par chalane ke liye.
+uvicorn[standard]>=0.29,<1.0
+# Backend-local .env values load karne ke liye.
+python-dotenv>=1.0,<2.0
